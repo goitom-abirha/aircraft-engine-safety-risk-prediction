@@ -1,9 +1,15 @@
 # Aircraft Engine Safety Risk Prediction
 
-Aviation-grade predictive safety analytics project using the **NASA C-MAPSS turbofan engine dataset**.  
-The system predicts **Remaining Useful Life (RUL)** of aircraft engines using deep learning models and converts predictions into **operational safety risk insights**.
+Predictive maintenance system for aircraft engines using deep learning and the NASA C-MAPSS dataset.
 
-The project simulates a predictive maintenance workflow aligned with **Safety Management Systems (SMS)** used in aviation operations.
+The project predicts **Remaining Useful Life (RUL)** of turbofan engines and converts predictions into **operational risk insights** to support maintenance decision-making.
+
+Key features:
+
+- Deep learning models (LSTM and GRU)
+- Engine-level failure risk prediction
+- Early warning alert generation
+- Fleet risk ranking for maintenance prioritization
 
 ---
 
@@ -77,7 +83,6 @@ Metrics used:
 Evaluates predictions using the **latest window per engine**, reflecting how airlines make maintenance decisions.
 
 ---
-
 # Project Pipeline
 
 Aircraft Sensor Data
@@ -90,15 +95,13 @@ Sliding Window Sequence Generation
 ↓
 LSTM / GRU Deep Learning Models
 ↓
-RUL Prediction
+Remaining Useful Life Prediction
 ↓
 Risk Scoring
 ↓
 Fleet Risk Ranking
 ↓
 Maintenance Decision Support
-
-
 ---
 
 # Notebooks
