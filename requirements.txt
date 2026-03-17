@@ -1,8 +1,8 @@
+streamlit
 numpy
 pandas
 scikit-learn
 matplotlib
-tensorflow
-shap
+tensorflow-cpu
 joblib
-pyyaml
+reportlab
