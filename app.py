@@ -6,6 +6,7 @@ from pathlib import Path
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 
 # ==============================
@@ -17,11 +18,22 @@ st.set_page_config(
 )
 
 # ==============================
-# PATHS (GitHub / Streamlit Cloud Safe)
+# PATHS
 # ==============================
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data" / "processed"
 MODEL_DIR = BASE_DIR / "models"
+
+# ==============================
+# OPTIONAL DEBUG CHECKS
+# ==============================
+st.sidebar.markdown("### File Checks")
+st.sidebar.write("Data folder exists:", DATA_DIR.exists())
+st.sidebar.write("Models folder exists:", MODEL_DIR.exists())
+st.sidebar.write("X file exists:", (DATA_DIR / "X_fd004_test_last.npy").exists())
+st.sidebar.write("y file exists:", (DATA_DIR / "y_fd004_test_last.npy").exists())
+st.sidebar.write("GRU model exists:", (MODEL_DIR / "gru_rul_model.h5").exists())
+st.sidebar.write("LSTM model exists:", (MODEL_DIR / "lstm_rul_model.h5").exists())
 
 # ==============================
 # LOAD DATA
@@ -39,10 +51,21 @@ model_choice = st.sidebar.selectbox(
     ["GRU", "LSTM"]
 )
 
+# ==============================
+# LOAD MODEL SAFELY
+# ==============================
 if model_choice == "GRU":
-    model = load_model(MODEL_DIR / "gru_rul_model.h5")
+    model = load_model(
+        MODEL_DIR / "gru_rul_model.h5",
+        compile=False,
+        custom_objects={"InputLayer": tf.keras.layers.InputLayer},
+    )
 else:
-    model = load_model(MODEL_DIR / "lstm_rul_model.h5")
+    model = load_model(
+        MODEL_DIR / "lstm_rul_model.h5",
+        compile=False,
+        custom_objects={"InputLayer": tf.keras.layers.InputLayer},
+    )
 
 # ==============================
 # PREDICTIONS
