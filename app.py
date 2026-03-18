@@ -7,7 +7,41 @@ from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import tensorflow as tf
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models import model_from_json
+import h5py
+
+# ==============================
+# LEGACY H5 MODEL LOADER
+# ==============================
+def load_legacy_model(path):
+    with h5py.File(path, "r") as f:
+        model_config = f.attrs.get("model_config")
+
+        if model_config is None:
+            raise ValueError("No model config found in H5 file.")
+
+        if isinstance(model_config, bytes):
+            model_config = model_config.decode("utf-8")
+
+        # remove incompatible keys from InputLayer config
+        import json
+        config_dict = json.loads(model_config)
+
+        for layer in config_dict.get("config", {}).get("layers", []):
+            if layer.get("class_name") == "InputLayer":
+                layer_config = layer.get("config", {})
+                layer_config.pop("batch_shape", None)
+                layer_config.pop("optional", None)
+
+        cleaned_config = json.dumps(config_dict)
+
+        model = model_from_json(
+            cleaned_config,
+            custom_objects={"InputLayer": tf.keras.layers.InputLayer}
+        )
+        model.load_weights(path)
+
+    return model
 
 # ==============================
 # PAGE CONFIG
@@ -55,17 +89,9 @@ model_choice = st.sidebar.selectbox(
 # LOAD MODEL SAFELY
 # ==============================
 if model_choice == "GRU":
-    model = load_model(
-        MODEL_DIR / "gru_rul_model.h5",
-        compile=False,
-        custom_objects={"InputLayer": tf.keras.layers.InputLayer},
-    )
+    model = load_legacy_model(MODEL_DIR / "gru_rul_model.h5")
 else:
-    model = load_model(
-        MODEL_DIR / "lstm_rul_model.h5",
-        compile=False,
-        custom_objects={"InputLayer": tf.keras.layers.InputLayer},
-    )
+    model = load_legacy_model(MODEL_DIR / "lstm_rul_model.h5")
 
 # ==============================
 # PREDICTIONS
